@@ -61,3 +61,19 @@ runner-nds/*.map
 runner-nds/build.log
 runner-nds/nitrofiles/
 trace_*.txt
+
+# NDS runner
+runner-nds/build/
+runner-nds/nitrofiles/
+runner-nds/*.nds
+runner-nds/*.elf
+runner-nds/*.map
+runner-nds/build.log
+
+# NDS runner
+runner-nds/build/
+runner-nds/nitrofiles/
+runner-nds/*.nds
+runner-nds/*.elf
+runner-nds/*.map
+runner-nds/build.log
