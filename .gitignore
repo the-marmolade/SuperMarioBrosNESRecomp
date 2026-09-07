@@ -52,3 +52,12 @@ assets_ssb64/
 _external/
 _validation/
 _validation_genesis/
+
+# NDS runner
+runner-nds/build/
+runner-nds/*.nds
+runner-nds/*.elf
+runner-nds/*.map
+runner-nds/build.log
+runner-nds/nitrofiles/
+trace_*.txt
