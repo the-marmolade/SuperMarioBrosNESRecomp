@@ -27,6 +27,26 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "nes_snapshot.h"
+#include <stdio.h>
+
+static uint32_t fnv1a(uint32_t h, const uint8_t *p, size_t n) {
+    for (size_t i = 0; i < n; i++) { h ^= p[i]; h *= 16777619u; }
+    return h;
+}
+
+static uint32_t trace_digest(void) {
+    NESSnapshot s;
+    nes_snapshot_capture(&s);
+    uint8_t regs[10] = { s.cpu_a, s.cpu_x, s.cpu_y, s.cpu_s,
+                         s.cpu_n, s.cpu_v, s.cpu_d, s.cpu_i, s.cpu_z, s.cpu_c };
+    uint32_t h = 2166136261u;
+    h = fnv1a(h, regs,      sizeof regs);
+    h = fnv1a(h, s.ram,     sizeof s.ram);
+    h = fnv1a(h, s.ppu_oam, sizeof s.ppu_oam);
+    h = fnv1a(h, s.ppu_pal, sizeof s.ppu_pal);
+    return h;
+}
 
 #ifdef _WIN32
 #  define WIN32_LEAN_AND_MEAN
@@ -298,6 +318,14 @@ void game_on_frame(uint64_t frame_count) {
 }
 
 void game_post_nmi(uint64_t frame_count) {
+    if (frame_count < 600) {
+        static FILE *tf = NULL;
+        if (!tf) tf = fopen("trace_pc.txt", "w");
+        if (tf) {
+            fprintf(tf, "%llu %08X\n", (unsigned long long)frame_count, trace_digest());
+            if (frame_count == 599) { fflush(tf); fclose(tf); tf = NULL; }
+        }
+    }
     (void)frame_count;
     ws_update_frame_gate();
     game_voxel_update();
